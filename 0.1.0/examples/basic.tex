@@ -1,0 +1,81 @@
+% Compile with XeLaTeX:  xelatex basic.tex
+%
+% Mirror of basic.typ for side-by-side comparison of url.sty (LaTeX)
+% vs. jurlstify (Typst). Page geometry, fonts, font size, leading, and
+% content are matched as closely as possible.
+
+\documentclass[10.5pt]{extarticle}
+
+% Match Typst: page(width: 10cm, margin: 1cm)  →  text area 8cm × ...
+\usepackage[paperwidth=10cm, paperheight=32cm,
+            left=1cm, right=1cm, top=1cm, bottom=1cm]{geometry}
+
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage{xeCJK}
+
+% Match Typst: no page number, no header/footer decoration.
+\pagestyle{empty}
+
+% Match Typst: text(font: ("Times New Roman", "Songti SC"))
+\setmainfont{Times New Roman}
+\setCJKmainfont{Songti SC}
+
+% Match jurlstify's default font: auto (inherit body font).
+% url.sty's default is \urlstyle{tt} — override so URL also renders in rm.
+\urlstyle{rm}
+
+% Typst's par(leading: 0.85em) adds 0.85em of extra space between lines on
+% top of the font height. LaTeX's \baselineskip already includes natural
+% line height, so set total \baselineskip ≈ font-size + 0.85em ≈ 10.5pt +
+% 0.85*10.5pt = 10.5pt*1.85 ≈ 19.4pt. Using \linespread to approximate.
+\linespread{1.48}\selectfont
+
+% Typst block styling: no paragraph indent, blocks separated by natural gap.
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5em}
+
+% url.sty's `hyphens' option is global. Declare a local hyphens-aware
+% variant so only section 4 uses it.
+\DeclareUrlCommand\urlh{\def\UrlBigBreaks{\do\:\do\-}}
+
+% Sidestep # / & catcode traps inside \newcommand.
+\urldef\longurl\url{https://example.com/very/long/path/to/some/resource?query=value&more=stuff#fragment}
+\urldef\hyphurl\url{https://my-very-long-sub-domain.example-site.org/path}
+\urldef\shorturl\url{https://example.com/automatically/handled/here}
+
+\begin{document}
+
+\begin{center}\bfseries\Large url.sty 示例\end{center}
+
+\textbf{1. 原生 URL 字符串 --- 两端对齐会产生大块空白或溢出}
+
+观察下面这段文字的排版：这是一段用来制造两端对齐压力的铺垫文字
+https://example.com/very/long/path/to/some/resource?query=value\&more=stuff\#fragment
+以及紧随其后的文字。
+
+\textbf{2. {\ttfamily\textbackslash url} --- 在恰当位置换行}
+
+观察下面这段文字的排版：这是一段用来制造两端对齐压力的铺垫文字 \longurl{} 以及紧随其后的文字。
+
+\textbf{3. {\ttfamily\textbackslash url} 独立占段}
+
+\longurl
+
+\textbf{4. 启用 hyphens 选项（连字符处可断）}
+
+\hyphurl
+
+\textbf{5. 文本中出现的 URL（LaTeX 里 \texttt{\textbackslash url} 本身就是全局行为）}
+
+文本中出现 \shorturl{} 时会自动插入断点。
+
+\textbf{6. 等宽字体（url.sty 默认 \texttt{\textbackslash urlstyle\{tt\}}）}
+
+{\urlstyle{tt}\longurl}
+
+\textbf{7. 自定义颜色 / 字号}
+
+{\color{blue}\fontsize{9}{10.8}\selectfont\longurl}
+
+\end{document}
